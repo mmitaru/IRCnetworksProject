@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="73181bcb-e384-4661-ac27-eed961b87e9c" name="Default" comment="" />
+    <list default="true" id="73181bcb-e384-4661-ac27-eed961b87e9c" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ircClient.py" afterPath="$PROJECT_DIR$/ircClient.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ircServer.py" afterPath="$PROJECT_DIR$/ircServer.py" />
+    </list>
     <ignored path="IRCnetworksProject.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -23,23 +26,24 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="ircServer.py" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="ircServer.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ircServer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.68122786" vertical-offset="833" max-vertical-offset="2415">
-              <caret line="94" column="16" selection-start-line="94" selection-start-column="16" selection-end-line="94" selection-end-column="16" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="248" max-vertical-offset="2385">
+              <caret line="37" column="18" selection-start-line="37" selection-start-column="18" selection-end-line="37" selection-end-column="18" />
               <folding>
                 <element signature="e#426#439#0" expanded="true" />
+                <element signature="e#4671#5487#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ircClient.py" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="ircClient.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ircClient.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="548" max-vertical-offset="1395">
-              <caret line="20" column="58" selection-start-line="20" selection-start-column="58" selection-end-line="20" selection-end-column="58" />
+            <state vertical-scroll-proportion="0.9208973" vertical-offset="210" max-vertical-offset="1860">
+              <caret line="66" column="37" selection-start-line="66" selection-start-column="37" selection-end-line="66" selection-end-column="37" />
               <folding>
                 <element signature="e#221#234#0" expanded="true" />
               </folding>
@@ -71,14 +75,14 @@
     <option name="changedFiles">
       <list>
         <option value="$PROJECT_DIR$/communication.py" />
-        <option value="$PROJECT_DIR$/ircClient.py" />
         <option value="$PROJECT_DIR$/ircServer.py" />
+        <option value="$PROJECT_DIR$/ircClient.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="442" />
-    <option name="y" value="102" />
+    <option name="x" value="577" />
+    <option name="y" value="53" />
     <option name="width" value="1108" />
     <option name="height" value="944" />
   </component>
@@ -311,7 +315,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="442" y="102" width="1108" height="944" extended-state="0" />
+    <frame x="577" y="53" width="1108" height="944" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -360,6 +364,7 @@
           <caret line="14" column="12" selection-start-line="14" selection-start-column="12" selection-end-line="14" selection-end-column="12" />
           <folding>
             <element signature="e#426#439#0" expanded="true" />
+            <element signature="e#4671#5487#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -380,6 +385,7 @@
           <caret line="14" column="12" selection-start-line="14" selection-start-column="12" selection-end-line="14" selection-end-column="12" />
           <folding>
             <element signature="e#426#439#0" expanded="true" />
+            <element signature="e#4671#5487#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -402,22 +408,23 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ircClient.py">
+    <entry file="file://$PROJECT_DIR$/ircServer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1395">
-          <caret line="20" column="58" selection-start-line="20" selection-start-column="58" selection-end-line="20" selection-end-column="58" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="248" max-vertical-offset="2385">
+          <caret line="37" column="18" selection-start-line="37" selection-start-column="18" selection-end-line="37" selection-end-column="18" />
           <folding>
-            <element signature="e#221#234#0" expanded="true" />
+            <element signature="e#426#439#0" expanded="true" />
+            <element signature="e#4671#5487#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ircServer.py">
+    <entry file="file://$PROJECT_DIR$/ircClient.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.68122786" vertical-offset="833" max-vertical-offset="2415">
-          <caret line="94" column="16" selection-start-line="94" selection-start-column="16" selection-end-line="94" selection-end-column="16" />
+        <state vertical-scroll-proportion="0.9208973" vertical-offset="210" max-vertical-offset="1860">
+          <caret line="66" column="37" selection-start-line="66" selection-start-column="37" selection-end-line="66" selection-end-column="37" />
           <folding>
-            <element signature="e#426#439#0" expanded="true" />
+            <element signature="e#221#234#0" expanded="true" />
           </folding>
         </state>
       </provider>

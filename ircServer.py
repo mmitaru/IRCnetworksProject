@@ -31,14 +31,23 @@ BUFSIZ = 1024
 class ChatServer(object):
     """ Simple chat server using select """
 
-    def __init__(self, port=3490, backlog=5):
+    def __init__(self, port=6667, backlog=5):
         self.clients = 0
         # Client map
         self.clientmap = {}
         # Room map
         self.roommap = {}
         # Command list
-        self.commandlist = ['NICK', 'CREATE', 'JOIN', 'QUIT', 'LISTROOMS', 'LISTALLROOMS']
+        self.dispatch = {
+            'NICK': self.do_nick,
+            'CREATE': self.do_create,
+            'JOIN': self.do_join,
+            'QUIT': self.do_quit,
+            'LISTROOMS': self.do_listrooms,
+            'LISTALLROOMS': self.do_listallrooms,
+            'PING': self.do_ping,
+            'PONG': self.do_pong
+        }
         # Output socket list
         self.outputs = []
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -86,23 +95,42 @@ class ChatServer(object):
 
         self.outputs.append(client)
 
+    def do_nick(self, client, arg):
+        self.clientmap[client] = (self.clientmap[client][0], arg)
+        print "NICK command received"
+    def do_create(self, client, arg):pass
+    def do_join(self, client, arg):pass
+    def do_quit(self, client, arg):pass
+    def do_listrooms(self, client, arg):pass
+    def do_listallrooms(self, client, arg):pass
+    def do_ping(self, client, arg):
+        print "PING command received"
+    def do_pong(self, client, arg):pass
+
+    def processcommand(self, client, command, arg):
+        command = self.dispatch[command]
+        command(client, arg)
+
     def handleclients(self, inputs, s):
         # handle all other sockets
         try:
             data = s.recv(BUFSIZ)
             # data = receive(s)
             if data:
-                
-                #temp = data.split()
-                #for i in temp:
-                #    if i in self.commandlist:
 
-                # Send as new client's message...
-                msg = '\n#[' + self.getname(s) + ']>> ' + data
-                # Send data to all except ourselves
-                for o in self.outputs:
-                    if o != s:
-                        o.send(msg)
+                temp = data.split()
+                if temp[0] in self.dispatch.keys():
+                    if len(temp) == 1:
+                        print temp[0] + " requires at least one argument"
+                    else:
+                        self.processcommand(s, temp[0], temp[1])
+                else:
+                    # Send as new client's message...
+                    msg = '\n#[' + self.getname(s) + ']>> ' + data
+                    # Send data to all except ourselves
+                    for o in self.outputs:
+                        if o != s:
+                            o.send(msg)
             else:
                 print 'chatserver: %d hung up' % s.fileno()
                 self.clients -= 1
