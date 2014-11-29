@@ -26,8 +26,10 @@ class ChatClient(object):
         self.flag = False
         self.port = 6667
         self.host = 'localhost'
+        self.rooms = []
+        self.rooms.append('Lobby')
         # Initial prompt
-        self.prompt='[' + '@'.join((self.name, self.host)) + ']> '
+        self.prompt='[' + '@'.join((self.name, '#' + '#'.join(self.rooms))) + ']> '
         # Command list
         self.dispatch = {
             'NICK': self.do_nick,
@@ -50,16 +52,29 @@ class ChatClient(object):
             data = self.sock.recv(BUFSIZ)
             # Contains client address, set it
             #addr = data.split('CLIENT: ')[1]
-            self.prompt = '[' + '@'.join((self.name, self.host)) + ']> '
+            self.prompt='[' + '@'.join((self.name, '#' + '#'.join(self.rooms))) + ']> '
         except socket.error, e:
             print 'Could not connect to chat server @%d' % self.port
             sys.exit(1)
 
     def do_nick(self, arg):
         self.name = arg
-        self.prompt='[' + '@'.join((self.name, self.host)) + ']> '
-    def do_create(self,arg):pass
-    def do_join(self, arg):pass
+        self.prompt='[' + '@'.join((self.name, '#' + '#'.join(self.rooms))) + ']> '
+    def do_create(self,arg):
+        # need to handle received "error"!
+        temp = self.sock.recv(BUFSIZ).split()
+        if not arg in self.rooms and temp[0] != "error":
+            self.rooms.append(arg)
+            self.prompt='[' + '@'.join((self.name, '#' + '#'.join(self.rooms))) + ']> '
+        else: print self.prompt + "client error"
+    def do_join(self, arg):
+        # need to handle received "error"!
+        temp = self.sock.recv(BUFSIZ).split()
+        if (not arg in self.rooms) and temp[0] != "error":
+            self.rooms.append(arg)
+            self.prompt='[' + '@'.join((self.name, '#' + '#'.join(self.rooms))) + ']> '
+        else: print self.prompt + "client error"
+
     def do_quit(self, arg):pass
     def do_listrooms(self, arg):pass
     def do_listallrooms(self, arg):pass
@@ -87,9 +102,9 @@ class ChatClient(object):
                         data = sys.stdin.readline().strip()
                         temp = data.split()
                         if data:
+                            self.sock.send(data)
                             if temp[0] in self.dispatch.keys() and len(temp) > 1:
                                 self.processcommand(temp[0], temp[1])
-                            self.sock.send(data)
                     elif i == self.sock:
                         # data = receive(self.sock)
                         data = self.sock.recv(BUFSIZ)

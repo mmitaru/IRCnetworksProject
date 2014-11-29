@@ -23,6 +23,7 @@ import select
 import socket
 import sys
 import signal
+from collections import defaultdict
 # from communication import send, receive
 
 BUFSIZ = 1024
@@ -36,7 +37,9 @@ class ChatServer(object):
         # Client map
         self.clientmap = {}
         # Room map
-        self.roommap = {}
+        self.roommap = defaultdict(list)
+        # client-room-map
+        self.clientroommap = defaultdict(list)
         # Command list
         self.dispatch = {
             'NICK': self.do_nick,
@@ -68,12 +71,9 @@ class ChatServer(object):
         self.server.close()
 
     def getname(self, client):
-
-        # Return the printable name of the
-        # client, given its socket...
         info = self.clientmap[client]
-        host, name = info[0][0], info[1]
-        return '@'.join((name, host))
+        return info[1] + '@'
+
 
     def connectclient(self, inputs):
         # handle the server socket
@@ -86,6 +86,8 @@ class ChatServer(object):
         self.clients += 1
         client.send('CLIENT: ' + str(address[0]))
         inputs.append(client)
+        self.roommap['Lobby'].append(client)
+        self.clientroommap[client].append('Lobby')
 
         self.clientmap[client] = (address, cname)
         # Send joining information to other clients
@@ -98,8 +100,23 @@ class ChatServer(object):
     def do_nick(self, client, arg):
         self.clientmap[client] = (self.clientmap[client][0], arg)
         print "NICK command received"
-    def do_create(self, client, arg):pass
-    def do_join(self, client, arg):pass
+    def do_create(self, client, arg):
+        if not self.roommap.has_key(arg):
+            self.roommap[arg].append(client)
+            self.clientroommap[client].append(arg)
+            client.send('ok')
+        else:
+            client.send("error")
+    def do_join(self, client, arg):
+        if self.roommap.has_key(arg):
+            if not arg in self.clientroommap[client]:
+                self.clientroommap[client].append(arg)
+                self.roommap[arg].append(client)
+                client.send('ok')
+            else:
+                client.send("error")
+        else:
+            client.send("error")
     def do_quit(self, client, arg):pass
     def do_listrooms(self, client, arg):pass
     def do_listallrooms(self, client, arg):pass
@@ -126,11 +143,17 @@ class ChatServer(object):
                         self.processcommand(s, temp[0], temp[1])
                 else:
                     # Send as new client's message...
-                    msg = '\n#[' + self.getname(s) + ']>> ' + data
+                    #msg = '\n#[' + self.getname(s) + ']>> ' + data
                     # Send data to all except ourselves
-                    for o in self.outputs:
-                        if o != s:
-                            o.send(msg)
+                    #for o in self.outputs:
+                    #    if o != s:
+                    #        o.send(msg)
+                    # send data to clients in our rooms
+                    for r in self.clientroommap[s]:
+                        for o in self.roommap[r]:
+                            if o != s:
+                                msg = '\n#[' + self.getname(s) + r + ']>> ' + data
+                                o.send(msg)
             else:
                 print 'chatserver: %d hung up' % s.fileno()
                 self.clients -= 1
