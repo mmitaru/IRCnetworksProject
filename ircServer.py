@@ -1,36 +1,19 @@
-# import SocketServer
-# from collections import defaultdict
-# import Queue
-# import threading
-# import thread
-# import select
-
-# FROM: http://code.activestate.com/recipes/531824-chat-server-client-using-selectselect/
-
-
-# First the server
-
 #!/usr/bin/env python
 
-"""
-A basic, multiclient 'chat server' using Python's select module
-with interrupt handling.
-
-Entering any line of input at the terminal will exit the server.
-"""
+# FROM: http://code.activestate.com/recipes/531824-chat-server-client-using-selectselect/
+# FROM: http://stackoverflow.com/questions/960733/python-creating-a-dictionary-of-lists
+# Matei Mitaru Networks Project CS494 Fall 2014 Portland State University
+# Simple TCP socket server/client IRC protocol implementation using the python select module
 
 import select
 import socket
 import sys
 import signal
 from collections import defaultdict
-# from communication import send, receive
 
 BUFSIZ = 1024
 
-
-class ChatServer(object):
-    """ Simple chat server using select """
+class ChatServer():
 
     def __init__(self, port=6667, backlog=5):
         self.clients = 0
@@ -40,16 +23,20 @@ class ChatServer(object):
         self.roommap = defaultdict(list)
         # client-room-map
         self.clientroommap = defaultdict(list)
-        # Command list
-        self.dispatch = {
+        # Command list: 1 arg commands
+        self.dispatch1 = {
             'NICK': self.do_nick,
             'CREATE': self.do_create,
             'JOIN': self.do_join,
+            'LEAVE': self.do_leave,
             'QUIT': self.do_quit,
-            'LISTROOMS': self.do_listrooms,
-            'LISTALLROOMS': self.do_listallrooms,
             'PING': self.do_ping,
             'PONG': self.do_pong
+        }
+        # Command list: 0 arg commands
+        self.dispatch0 = {
+            'LISTROOMS': self.do_listrooms,
+            'LISTALLROOMS': self.do_listallrooms
         }
         # Output socket list
         self.outputs = []
@@ -99,14 +86,15 @@ class ChatServer(object):
 
     def do_nick(self, client, arg):
         self.clientmap[client] = (self.clientmap[client][0], arg)
-        print "NICK command received"
+
     def do_create(self, client, arg):
         if not self.roommap.has_key(arg):
             self.roommap[arg].append(client)
             self.clientroommap[client].append(arg)
-            client.send('ok')
+            client.send("ok")
         else:
             client.send("error")
+
     def do_join(self, client, arg):
         if self.roommap.has_key(arg):
             if not arg in self.clientroommap[client]:
@@ -117,16 +105,36 @@ class ChatServer(object):
                 client.send("error")
         else:
             client.send("error")
+
+    def do_leave(self, client, arg):
+        if self.roommap.has_key(arg) and arg in self.clientroommap[client]:
+            self.roommap[arg].remove(client)
+            self.clientroommap[client].remove(arg)
+            client.send("ok")
+        else:
+            client.send("error")
+
     def do_quit(self, client, arg):pass
-    def do_listrooms(self, client, arg):pass
-    def do_listallrooms(self, client, arg):pass
-    def do_ping(self, client, arg):
-        print "PING command received"
+
+    def do_listrooms(self, client):
+        for r in self.clientroommap[client]:
+            client.send("\n" + r)
+
+    def do_listallrooms(self, client):
+        for r in self.roommap:
+            client.send("\n" + r)
+
+    def do_ping(self, client, arg):pass
+
     def do_pong(self, client, arg):pass
 
     def processcommand(self, client, command, arg):
-        command = self.dispatch[command]
+        command = self.dispatch1[command]
         command(client, arg)
+
+    def processnoargcommand(self, client, command):
+        command = self.dispatch0[command]
+        command(client)
 
     def handleclients(self, inputs, s):
         # handle all other sockets
@@ -136,11 +144,13 @@ class ChatServer(object):
             if data:
 
                 temp = data.split()
-                if temp[0] in self.dispatch.keys():
+                if temp[0] in self.dispatch1.keys():
                     if len(temp) == 1:
                         print temp[0] + " requires at least one argument"
                     else:
                         self.processcommand(s, temp[0], temp[1])
+                elif temp[0] in self.dispatch0.keys():
+                    self.processnoargcommand(s, temp[0])
                 else:
                     # Send as new client's message...
                     #msg = '\n#[' + self.getname(s) + ']>> ' + data
