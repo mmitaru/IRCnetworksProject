@@ -28,15 +28,15 @@ class ChatServer():
             'NICK': self.do_nick,
             'CREATE': self.do_create,
             'JOIN': self.do_join,
-            'LEAVE': self.do_leave,
-            'QUIT': self.do_quit,
+            'PART': self.do_leave,
             'PING': self.do_ping,
             'PONG': self.do_pong
         }
         # Command list: 0 arg commands
         self.dispatch0 = {
             'LISTROOMS': self.do_listrooms,
-            'LISTALLROOMS': self.do_listallrooms
+            'LISTALLROOMS': self.do_listallrooms,
+            'QUIT': self.do_quit
         }
         # Output socket list
         self.outputs = []
@@ -114,7 +114,12 @@ class ChatServer():
         else:
             client.send("error")
 
-    def do_quit(self, client, arg):pass
+    def do_quit(self, client):
+        for r in self.roommap:
+            if client in self.roommap[r]:
+                self.roommap[r].remove(client)
+        self.clientroommap.pop(client)
+
 
     def do_listrooms(self, client):
         for r in self.clientroommap[client]:

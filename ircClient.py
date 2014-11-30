@@ -30,14 +30,15 @@ class ChatClient():
             'NICK': self.do_nick,
             'CREATE': self.do_create,
             'JOIN': self.do_join,
-            'LEAVE': self.do_leave,
+            'PART': self.do_leave,
             'QUIT': self.do_quit,
             'PING': self.do_ping,
             'PONG': self.do_pong
         }
         self.dispatch0 = {
             'LISTROOMS': self.do_listrooms,
-            'LISTALLROOMS': self.do_listallrooms
+            'LISTALLROOMS': self.do_listallrooms,
+            'QUIT': self.do_quit
         }
         # Connect to server at port
         try:
@@ -83,7 +84,11 @@ class ChatClient():
             self.prompt='[' + '@'.join((self.name, '#' + '#'.join(self.rooms))) + ']> '
         else: print self.prompt + "client error"
 
-    def do_quit(self, arg):pass
+    def do_quit(self):
+        time.sleep(.01)
+        print "\nclosing connection..."
+        self.flag = True
+        self.sock.close()
 
     def do_listrooms(self):
         time.sleep(.01)
@@ -111,7 +116,7 @@ class ChatClient():
                 sys.stdout.write(self.prompt)
                 sys.stdout.flush()
 
-                # Wait for input from stdin & socket
+                # check for input from stdin and socket
                 inputready, outputready,exceptready = select.select([0, self.sock], [],[])
 
                 for i in inputready:
@@ -126,7 +131,6 @@ class ChatClient():
                             elif temp[0] in self.dispatch0.keys():
                                 self.processnoargcommand(temp[0])
                     elif i == self.sock:
-                        # data = receive(self.sock)
                         data = self.sock.recv(BUFSIZ)
                         # handle broken connection
                         if not data:
@@ -139,7 +143,7 @@ class ChatClient():
                             sys.stdout.flush()
 
             except KeyboardInterrupt:
-                print 'Interrupted.'
+                print "closing connection..."
                 self.sock.close()
                 break
 
