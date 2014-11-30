@@ -11,6 +11,7 @@ import select
 import time
 
 BUFSIZ = 1024
+CHILL = .01
 
 class ChatClient():
     """ A simple command line chat client using select """
@@ -38,7 +39,8 @@ class ChatClient():
         self.dispatch0 = {
             'LISTROOMS': self.do_listrooms,
             'LISTALLROOMS': self.do_listallrooms,
-            'QUIT': self.do_quit
+            'QUIT': self.do_quit,
+            'NAMES':self.do_names
         }
         # Connect to server at port
         try:
@@ -85,16 +87,19 @@ class ChatClient():
         else: print self.prompt + "client error"
 
     def do_quit(self):
-        time.sleep(.01)
+        time.sleep(CHILL)
         print "\nclosing connection..."
         self.flag = True
         self.sock.close()
 
     def do_listrooms(self):
-        time.sleep(.01)
+        time.sleep(CHILL)
 
     def do_listallrooms(self):
-        time.sleep(.01)
+        time.sleep(CHILL)
+
+    def do_names(self):
+        time.sleep(CHILL)
 
     def do_ping(self, arg):
         print "PING command received"

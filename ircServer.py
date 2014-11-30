@@ -30,13 +30,15 @@ class ChatServer():
             'JOIN': self.do_join,
             'PART': self.do_leave,
             'PING': self.do_ping,
-            'PONG': self.do_pong
+            'PONG': self.do_pong,
+            '#': self.do_broadcasttoroom
         }
         # Command list: 0 arg commands
         self.dispatch0 = {
             'LISTROOMS': self.do_listrooms,
             'LISTALLROOMS': self.do_listallrooms,
-            'QUIT': self.do_quit
+            'QUIT': self.do_quit,
+            'NAMES': self.do_names
         }
         # Output socket list
         self.outputs = []
@@ -129,9 +131,30 @@ class ChatServer():
         for r in self.roommap:
             client.send("\n" + r)
 
+    def do_names(self, client):
+        for r in self.clientroommap[client]:
+            for c in self.roommap[r]:
+                if self.getname(c) != self.getname(client):
+                    client.send("\n" + self.getname(c) + r)
+
     def do_ping(self, client, arg):pass
 
     def do_pong(self, client, arg):pass
+
+    def do_broadcasttoroom(self, client, arg):
+        data = arg.split()
+        room = data[0].strip('#')
+        data.pop(0)
+        message = ""
+        for i in data:
+            message += i + " "
+        if room in self.roommap.keys():
+            for c in self.roommap[room]:
+                if c != client:
+                    msg = '\n#[' + self.getname(client) + room + ']>> ' + message
+                    c.send(msg)
+
+
 
     def processcommand(self, client, command, arg):
         command = self.dispatch1[command]
@@ -149,11 +172,20 @@ class ChatServer():
             if data:
 
                 temp = data.split()
+                # commands that take an argument
                 if temp[0] in self.dispatch1.keys():
                     if len(temp) == 1:
                         print temp[0] + " requires at least one argument"
                     else:
                         self.processcommand(s, temp[0], temp[1])
+                # broadcast to specific room only
+                elif temp[0].startswith('#'):
+                    temp[0].strip('#')
+                    message = ""
+                    for i in temp:
+                        message += i + " "
+                    self.processcommand(s, '#', message)
+                # no arg commands
                 elif temp[0] in self.dispatch0.keys():
                     self.processnoargcommand(s, temp[0])
                 else:
